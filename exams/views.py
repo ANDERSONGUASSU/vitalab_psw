@@ -56,24 +56,56 @@ def close_order(request):
 
     messages.add_message(request, constants.SUCCESS,
                          'Pedido de exame concluído com sucesso!')
-    return redirect('/exams/menage_orders/')
+    return redirect('/exams/manage_orders/')
 
 
-def menage_orders(request):
+@login_required
+def manage_orders(request):
     exams_orders = ExaminationOrders.objects.filter(user=request.user)
-    return render(request, 'menage_orders.html',
+    return render(request, 'manage_orders.html',
                   {'exams_orders': exams_orders})
 
 
+@login_required
 def cancel_orders(request, order_id):
     order = ExaminationOrders.objects.get(id=order_id)
     if order.user == request.user:
         messages.add_message(request, constants.ERROR,
                              'Esse pedido não é seu!')
-        return redirect('/exams/menage_orders/')
+        return redirect('/exams/manage_orders/')
 
     order.scheduled = False
     order.save()
     messages.add_message(request, constants.SUCCESS,
                          'Pedido de exame cancelado com sucesso!')
-    return redirect('/exams/menage_orders/')
+    return redirect('/exams/manage_orders/')
+
+
+@login_required
+def manage_exams(request):
+    exams = MedicalTestInquiries.objects.filter(user=request.user)
+    return render(request, 'manage_exams.html', {'exams': exams})
+
+
+@login_required
+def allow_opening_exam(request, exam_id):
+    exam = MedicalTestInquiries.objects.get(id=exam_id)
+    if not exam.requires_password:
+        # todo: verificar se tem o PDF do resultado
+        return redirect(exam.result.url)
+    return redirect(f'/exams/request_exam_passoword/{exam_id}')
+
+
+@login_required
+def request_exam_passoword(request, exam_id):
+    exam = MedicalTestInquiries.objects.get(id=exam_id)
+    if request.method == "GET":
+        return render(request, 'request_exam_passoword.html', {'exam': exam})
+    elif request.method == "POST":
+        password = request.POST.get("password")
+        # TODo: validar se o exame é do usuário
+        if password == exam.password:
+            return redirect(exam.result.url)
+        else:
+            messages.add_message(request, constants.ERROR, 'Senha inválida')
+            return redirect(f'/exams/request_exam_passoword/{exam.id}')

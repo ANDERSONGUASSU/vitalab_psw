@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils.safestring import mark_safe
 
 
 class TypesExams(models.Model):
@@ -28,10 +29,20 @@ class MedicalTestInquiries(models.Model):
     status = models.CharField(max_length=2, choices=choice_status)
     result = models.FileField(upload_to="results", null=True, blank=True)
     requires_password = models.BooleanField(default=False)
-    paasword = models.CharField(max_length=16, null=True, blank=True)
+    password = models.CharField(max_length=16, null=True, blank=True)
 
     def __str__(self):
         return f'{self.user} | {self.exam.name}'
+
+    def badge_template(self):
+        if self.status == "E":
+            classes = 'bg-warning text-dark'
+            text = "Em análise"
+        elif self.status == "F":
+            classes = 'bg-success'
+            text = "Finalizado"
+
+        return mark_safe(f'<span class= "badge {classes}">{text}</span>')
 
 
 class ExaminationOrders(models.Model):

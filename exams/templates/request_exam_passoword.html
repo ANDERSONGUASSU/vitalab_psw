@@ -1,0 +1,36 @@
+{% extends "bases/base.html" %}
+{% load static %}
+
+{% block 'head' %}
+    <link href="{% static 'exams/css/exams.css' %}" rel="stylesheet">
+    <link href="{% static 'exams/css/manage_exams.css' %}" rel="stylesheet">
+    <link href="{% static 'exams/css/manage_order.css' %}" rel="stylesheet">
+{% endblock 'head' %}
+
+
+{% block 'content' %}
+    <br><br>
+    
+    <div class="container">
+        {% if messages %}
+            <br>
+            {% for message in messages %}
+            <div class="alert {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+        <h3>{{exam.exam.name}}</h3>
+        <br>
+        <form action="{% url "request_exam_passoword" exam.id %}" method="POST">{% csrf_token %}
+            
+            <label>Senha de acesso</label>
+            <br>
+            <input type="text" name="password" class="form-control" style="width: 40%">
+            <br>
+
+            <input type="submit" class="btn-default">
+            
+        </form>
+        
+    </div>
+
+{% endblock 'content' %}
