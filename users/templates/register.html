@@ -1,0 +1,71 @@
+{% extends "bases/base.html" %}
+{% load static %}
+
+{% block 'head' %}
+ <link rel="stylesheet" href="{% static "geral/css/base.css" %}">
+ <link rel="stylesheet" href="{% static "users/css/users.css" %}">
+
+{% endblock 'head' %}
+
+{% block 'content' %}
+<br>
+<br>
+<div class="container">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert {{message.tags}}">
+                {{message}}
+            </div>
+        {% endfor %}
+    {% endif %}
+    <h3 class="font-contrast">Cadastre-se</h3>
+    <form action="{% url "register" %}" method="POST"> {% csrf_token %}
+        <div class="row">
+            <div class="col-md-3 text-center">
+                <img src="{% static "users/img/logo.png" %}" alt="">
+                <h3>VitalLab</h3>
+            </div>
+            <div class="col-md-9">
+
+                <label for="">Primeiro nome</label>
+                <br>
+                <input type="text" class="input-default" name="first_name" placeholder="Insira seu primeiro nome">
+                <br>
+                <br>
+                <label for="">Último nome</label>
+                <br>
+                <input type="text" class="input-default" name="last_name" placeholder="Insira seu sobrenome">
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <br>
+                <label for="">Username</label>
+                <br>
+                <input type="text" class="input-default w100" name="username" placeholder="Insira seu nome de usuário">
+                <br>
+                <br>
+                <label for="">Senha</label>
+                <br>
+                <input type="password" class="input-default w100" name="password" placeholder="Insira sua senha">
+            </div>
+            <div class="col-md-4">
+                <br>
+                <label for="">E-mail</label>
+                <br>
+                <input type="email" class="input-default w100" name="email" placeholder="Insira seu E-mail">
+                <br>
+                <br>
+                <label for="">Confirmar senha</label>
+                <br>
+                <input type="password" class="input-default w100" name="confirm_password" placeholder="Confirme sua senha">
+            </div>
+
+        </div>
+        <br>
+        <button type="submit" class="btn-default">Enviar</button>
+    </form>
+</div>
+
+{% endblock 'content' %}
