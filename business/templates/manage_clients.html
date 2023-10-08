@@ -43,7 +43,7 @@
 
                 {% for client in clients %}
                     <tr class="table-row">
-                        <td><a href="#">{{client.get_full_name}}</a></td>
+                        <td><a href="{% url "client" client.id %}">{{client.get_full_name}}</a></td>
                         <td>{{client.email}}</td>
                         <td>
                             <!-- Add CPF information here -->
