@@ -1,6 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils.safestring import mark_safe
+from secrets import token_urlsafe
+from django.utils import timezone
+from datetime import timedelta
 
 
 class TypesExams(models.Model):
@@ -53,3 +56,32 @@ class ExaminationOrders(models.Model):
 
     def __str__(self):
         return f'{self.user} | {self.date}'
+
+
+class MedicalAccess(models.Model):
+    user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
+    identification = models.CharField(max_length=50)
+    access_time = models.IntegerField()
+    created_at = models.DateTimeField()
+    initial_exam_date = models.DateField()
+    final_exam_date = models.DateField()
+    token = models.CharField(max_length=20, null=True, blank=True)
+
+    def __str__(self):
+        return self.token
+
+    def save(self, *args, **kwargs):
+        if not self.token:
+            self.token = token_urlsafe(6)
+
+        super(MedicalAccess, self).save(*args, **kwargs)
+
+    @property
+    def status(self):
+        return 'Expirado' if timezone.now() > (self.created_at + timedelta(
+            hours=self.access_time)) else 'Ativo'
+
+    @property
+    def link(self):
+        # TODo: reverse
+        return f'http://127.0.0.1:8000/exams/medical_access/{self.token}'

@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from .models import TypesExams, MedicalTestInquiries, ExaminationOrders
+from .models import TypesExams, MedicalTestInquiries, ExaminationOrders, MedicalAccess # NOQA
 from datetime import datetime
 from django.contrib import messages
 from django.contrib.messages import constants
@@ -109,3 +109,48 @@ def request_exam_passoword(request, exam_id):
         else:
             messages.add_message(request, constants.ERROR, 'Senha inválida')
             return redirect(f'/exams/request_exam_passoword/{exam.id}')
+
+
+@login_required
+def generate_medical_access(request):
+    if request.method == "GET":
+        medical_accesses = MedicalAccess.objects.filter(user=request.user)
+        return render(request, 'generate_medical_access.html',
+                      {'medical_accesses': medical_accesses})
+    elif request.method == "POST":
+        identification = request.POST.get('identification')
+        access_time = request.POST.get('access_time')
+        initial_exam_date = request.POST.get("initial_exam_date")
+        final_exam_date = request.POST.get("final_exam_date")
+
+        medical_access = MedicalAccess(
+            user=request.user,
+            identification=identification,
+            access_time=access_time,
+            initial_exam_date=initial_exam_date,
+            final_exam_date=final_exam_date,
+            created_at=datetime.now()
+        )
+
+        medical_access.save()
+
+        messages.add_message(request, constants.SUCCESS,
+                             'Acesso gerado com sucesso')
+        return redirect('/exams/generate_medical_access')
+
+
+def medical_access(request, token):
+    medical_access = MedicalAccess.objects.get(token=token)
+
+    if medical_access.status == 'Expirado':
+        messages.add_message(request, constants.WARNING,
+                             'Esse link já se expirou!')
+        return redirect('/users/login')
+
+    medical_requests = ExaminationOrders.objects.filter(
+        date__gte=medical_access.initial_exam_date).filter(
+            date__lte=medical_access.final_exam_date).filter(
+                user=medical_access.user)
+
+    return render(request, 'medical_access.html',
+                  {'medical_requests': medical_requests})

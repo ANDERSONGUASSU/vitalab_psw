@@ -1,0 +1,33 @@
+{% extends "bases/base.html" %} {% load static %} {% block 'head' %}
+    <link href="{% static 'exams/css/exams.css' %}" rel="stylesheet" />
+    <link href="{% static 'exams/css/manage_order.css' %}" rel="stylesheet" />
+{% endblock 'head' %} {% block 'content' %}
+    <br />
+    <br />
+    <div class="container">
+        <table style="">
+            <tr>
+                <th>ID</th>
+                <th>Exame</th>              
+            </tr>
+            {% for request in medical_requests %}
+                {% for exam in request.exams.all %}
+                
+                    <tr class="table-row">
+                        <td>{{ exam.exam.name }}</td>
+                        
+                        {% if exam.result %}
+                            <td>
+                                <a style="text-decoration: none;"
+                                class="btn-secondary" href="{{ exam.result.url }}">Resultado</a></td>
+                        {% else %}
+                            <td>Em análise</td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+            {% endfor %}
+            <br>
+        
+        </table>
+    </div>
+{% endblock 'content' %}
