@@ -8,7 +8,7 @@ urlpatterns = [
     path('proxy_pdf/<int:exam_id>', views.proxy_pdf, name="proxy_pdf"),
     path('generate_password/<int:exam_id>', views.generate_password,
          name="generate_password"),
-    path('update_exam_data/<int:exame_id>', views.update_exam_data,
+    path('update_exam_data/<int:exam_id>', views.update_exam_data,
          name="update_exam_data"),
 
 ]

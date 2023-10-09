@@ -66,26 +66,26 @@ def generate_password(request, exam_id):
 
 
 @staff_member_required
-def update_exam_data(request, exame_id):
-    exame = MedicalTestInquiries.objects.get(id=exame_id)
+def update_exam_data(request, exam_id):
+    exam = MedicalTestInquiries.objects.get(id=exam_id)
 
     pdf = request.FILES.get('result')
     status = request.POST.get('status')
     requires_password = request.POST.get('requires_password')
 
-    if requires_password and (not exame.password):
+    if requires_password and (not exam.password):
         messages.add_message(
             request, constants.ERROR,
-            'To require a password, first create one.')
-        return redirect(f'/empresarial/exame_cliente/{exame_id}')
+            'Para exigir uma senha, primeiro crie uma.')
+        return redirect(f'/business/exam_client/{exam_id}')
 
-    exame.requires_password = True if requires_password else False
+    exam.requires_password = True if requires_password else False
 
     if pdf:
-        exame.result = pdf
+        exam.result = pdf
 
-    exame.status = status
-    exame.save()
+    exam.status = status
+    exam.save()
     messages.add_message(
         request, constants.SUCCESS, 'Change made successfully')
-    return redirect(f'/empresarial/exame_cliente/{exame_id}')
+    return redirect(f'/business/exam_client/{exam_id}')
